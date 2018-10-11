@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
+
+	<!-- Propagate changes to JDK loggers redirected to logback-->
+	<contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+		<resetJUL>true</resetJUL>
+	</contextListener>
+
+	<property name="PATTERN" value="%d{dd-MMM-yyyy HH:mm:ss.SSS}|%5p|%X{camel.exchangeId}:%X{camel.routeId}|%c{0}:%L %m%n" />
+    <property name="PROFILING-PATTERN" value="%d{dd-MMM-yyyy HH:mm:ss.SSS}[%5p][%5.5t][%c{0}:%L] %m%n" />
+	
+	<property name="CONSOLE_LEVEL" value="ALL" />
+	
+	<property name="DEFAULT_BASE" value="../"/>
+	
+	<property name="LOG_ROLLOVER_MAX_HISTORY" value="7"/>
+	<property name="LOG_ROLLOVER_MAX_SIZE" value="100MB"/>
+	<property name="LOG_ROLLOVER_ARCHIVE_PATTERN" value="%d{yyyy-MM-dd}.%i.log"/>
+	
+	
+	<property name="LOG_LOCATION" value="${DEFAULT_BASE}/logs" />
+	<property name="CONFIG_LOCATION" value="${DEFAULT_BASE}/conf" />
+	
+	<property name="APPLICATION_NAME" value="gembusinessservicestest" />
+
+	<property file="${CONFIG_LOCATION}/${APPLICATION_NAME}/logback.properties"/>
+
+	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter" >
+      		<level>${CONSOLE_LEVEL}</level>
+    	</filter>
+		<encoder>
+			<pattern>${PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Roll over every day or if we reach LOG_ROLLOVER_MAX_SIZE and keep LOG_ROLLOVER_MAX_HISTORY days-->
+	<appender name="ApplicationLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<file>${LOG_LOCATION}/${APPLICATION_NAME}.log</file>
+		<encoder>
+			<pattern>${PATTERN}</pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_LOCATION}/${APPLICATION_NAME}.${LOG_ROLLOVER_ARCHIVE_PATTERN}</fileNamePattern>
+			<maxHistory>${LOG_ROLLOVER_MAX_HISTORY}</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- or whenever the file size reaches LOG_ROLLOVER_MAX_SIZE MB -->
+				<maxFileSize>${LOG_ROLLOVER_MAX_SIZE}</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+
+	</appender>
+
+	<logger name="net.sf" level="WARN"/>
+	<logger name="org.springframework" level="INFO"/>
+	<logger name="org.hibernate" level="WARN"/>
+	<logger name="org.hibernate.cache" level="WARN"/>
+	<logger name="org.apache.commons" level="WARN"/>
+	<logger name="o.a.c" level="WARN"/>
+	<logger name="o.a.cxf" level="WARN"/>
+	<logger name="org.apache.cxf" level="WARN"/>
+	<logger name="com.northgateis" level="DEBUG"/>
+  
+	<root level="INFO">
+		<appender-ref ref="Console"/>
+		<appender-ref ref="ApplicationLog"/>
+	</root>
+	
+	<!-- Import any configuration we find in conf -->
+	<include optional="true" file="${CONFIG_LOCATION}/${APPLICATION_NAME}/logback.xml" />
+
+</configuration>

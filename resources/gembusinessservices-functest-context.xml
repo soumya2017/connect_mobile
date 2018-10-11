@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://cxf.apache.org/jaxws
+		http://cxf.apache.org/schemas/jaxws.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+ 	<bean id="propertyPlaceholder" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="file:../conf/gembusinessservicestest/gembusinessservices-functest-context.properties">
+			<description>
+				Load up the usual .properties file, but afford e.g. Hudson the ability to override certain config
+				values using -DsystemParameter=someValue command line options.
+			</description>
+		</property>
+		<property name="localOverride" value="true">
+			<description>
+				Means that the settings in "properties" below override what is taken from the file
+			</description>
+		</property>
+		<property name="systemPropertiesMode" value="2">
+			<description>
+				2=Override. Allows us to set businessServicesServiceUrl to a specific, localised value (e.g. on Hudson)
+			</description>
+		</property>		
+	</bean>
+	
+	<!-- POLE BS -->
+	<jaxws:client id="poleBusinessServicesClient"
+		serviceClass="com.northgateis.pole.schema.Pole"
+		address="${businessServicesServiceUrl}">
+	</jaxws:client>
+	<bean id="businessServicesJsonRestClient" 
+		class="com.northgateis.gem.bussvc.poleobjects.client.PoleBusinessServicesJsonRestClient">
+		<property name="address" value="${businessServicesRestUrl}"/>
+	</bean>	
+
+	<!-- CUSTOM / FREESTANDING BS -->
+	<jaxws:client id="businessServicesClient"
+		serviceClass="com.northgateis.gem.bussvc.api.schema.BusinessServicesPort"
+		address="${customBusinessServicesServiceUrl}">
+	</jaxws:client>
+	<bean id="customBusinessServicesJsonRestClient" 
+		class="com.northgateis.gem.bussvc.api.rest.BusinessServicesJsonRestClient">
+		<property name="address" value="${customBusinessServicesRestUrl}"/>
+	</bean>	
+	
+	<jaxws:client id="poleService"
+		serviceClass="com.northgateis.pole.schema.Pole"
+		address="${poleServiceUrl}" />	
+
+	<jaxws:client id="poleServiceForMetadata"
+		serviceClass="com.northgateis.pole.schema.Pole"
+		address="${poleServiceEntityMetadataUrl}" />		
+							
+	<jaxws:client id="securityService"
+		serviceClass="com.northgateis.gem.bussvc.security.SecuritymessagesPort"
+		address="${securityServiceUrl}" />
+		
+	<jaxws:client id="attachmentsService"
+		serviceClass="com.northgateis.gem.bussvc.attachment.api.AttachmentPort"
+		address="${attachmentServiceURL}" />	
+		
+							
+	<jaxws:client id="savingOfDataService"
+		serviceClass="com.northgateis.gem.bussvc.statecache.SavingOfDataPort"
+		address="${sodServiceUrl}" />	
+		
+	<jaxws:client id="poleFlowSoapService"
+		serviceClass="com.northgateis.gem.bussvc.poleflow.POLEflowSoap"
+		address="${poleFlowURL}" />	
+		
+	<bean id="cvListCacheBean" 
+		class="com.northgateis.gem.bussvc.pole.cvlists.CvListCacheBean">
+	</bean>
+		
+</beans>
